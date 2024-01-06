@@ -4,6 +4,8 @@ const API_URL = "http://localhost:8080";
 
 function App() {
   const [data, setData] = useState<string>();
+  const [verify, setVerify] = useState<boolean>();
+  const [showMessage, setShowMessage] = useState<boolean>(false)
 
   useEffect(() => {
     getData();
@@ -12,6 +14,9 @@ function App() {
   const getData = async () => {
     const response = await fetch(API_URL);
     const { data } = await response.json();
+    console.log('Response: ', response)
+    const token = data.token
+    console.log("Token received: ", token)
     setData(data);
   };
 
@@ -29,7 +34,14 @@ function App() {
   };
 
   const verifyData = async () => {
-    throw new Error("Not implemented");
+    setShowMessage(true)
+    const url = API_URL + '/verify'
+    const verifiedData = await fetch(url, {
+      method: 'GET',
+      credentials: 'include'
+    })
+    const { verified } = await verifiedData.json()
+    setVerify(verified)
   };
 
   return (
@@ -63,6 +75,13 @@ function App() {
           Verify Data
         </button>
       </div>
+
+      {showMessage ?
+      <div style={{ fontSize: "10pt" }}>
+        {verify ? "Your data is secured" : "Your data has been tampered"}
+      </div>
+      : null
+      }
     </div>
   );
 }
